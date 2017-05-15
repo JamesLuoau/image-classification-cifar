@@ -42,7 +42,7 @@ def neural_net_image_input(image_shape):
     : image_shape: Shape of the images
     : return: Tensor for image input.
     """
-    return tf.placeholder(tf.uint8, (None, *image_shape), "x")
+    return tf.placeholder(tf.float32, (None, *image_shape), "x")
 
 
 def neural_net_label_input(n_classes):
@@ -51,7 +51,7 @@ def neural_net_label_input(n_classes):
     : n_classes: Number of classes
     : return: Tensor for label input.
     """
-    return tf.placeholder(tf.uint8, (None, n_classes), "y")
+    return tf.placeholder(tf.float32, (None, n_classes), "y")
 
 
 def neural_net_keep_prob_input():
@@ -59,7 +59,7 @@ def neural_net_keep_prob_input():
     Return a Tensor for keep probability
     : return: Tensor for keep probability.
     """
-    return tf.placeholder(tf.float16, None, "keep_prob")
+    return tf.placeholder(tf.float32, None, "keep_prob")
 
 
 """
@@ -151,3 +151,60 @@ DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 tests.test_output(output)
 
+
+def conv_net(x, keep_prob):
+    """
+    Create a convolutional neural network model
+    : x: Placeholder tensor that holds image data.
+    : keep_prob: Placeholder tensor that hold dropout keep probability.
+    : return: Tensor that represents logits
+    """
+    conv_ksize = [4, 4]
+    conv_strides = [1, 1]
+    pool_ksize = [2, 2]
+    pool_strides = [2, 2]
+
+    conv1 = conv2d_maxpool(x, 16, conv_ksize, conv_strides, pool_ksize, pool_strides)
+    conv2 = conv2d_maxpool(conv1, 32, conv_ksize, conv_strides, pool_ksize, pool_strides)
+    conv3 = conv2d_maxpool(conv2, 64, conv_ksize, conv_strides, pool_ksize, pool_strides)
+
+    f = flatten(conv3)
+
+    fc = fully_conn(f, 10)
+    fc = tf.nn.dropout(fc, keep_prob)
+
+    output_layer = output(fc, 10)
+    return output_layer
+
+
+"""
+DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
+"""
+
+##############################
+## Build the Neural Network ##
+##############################
+
+# Remove previous weights, bias, inputs, etc..
+tf.reset_default_graph()
+
+# Inputs
+x = neural_net_image_input((32, 32, 3))
+y = neural_net_label_input(10)
+keep_prob = neural_net_keep_prob_input()
+
+# Model
+logits = conv_net(x, keep_prob)
+
+# Name logits Tensor, so that is can be loaded from disk after training
+logits = tf.identity(logits, name='logits')
+
+# Loss and Optimizer
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=y))
+optimizer = tf.train.AdamOptimizer().minimize(cost)
+
+# Accuracy
+correct_pred = tf.equal(tf.argmax(logits, 1), tf.argmax(y, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32), name='accuracy')
+
+tests.test_conv_net(conv_net)
