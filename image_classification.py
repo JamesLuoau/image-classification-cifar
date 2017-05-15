@@ -96,3 +96,18 @@ def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ks
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 tests.test_con_pool(conv2d_maxpool)
+
+
+def flatten(x_tensor):
+    """
+    Flatten x_tensor to (Batch Size, Flattened Image Size)
+    : x_tensor: A tensor of size (Batch Size, ...), where ... are the image dimensions.
+    : return: A tensor of size (Batch Size, Flattened Image Size).
+    """
+    return tf.contrib.layers.flatten(x_tensor)
+
+
+"""
+DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
+"""
+tests.test_flatten(flatten)
