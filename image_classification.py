@@ -111,3 +111,43 @@ def flatten(x_tensor):
 DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
 """
 tests.test_flatten(flatten)
+
+
+def fully_conn(x_tensor, num_outputs):
+    """
+    Apply a fully connected layer to x_tensor using weight and bias
+    : x_tensor: A 2-D tensor where the first dimension is batch size.
+    : num_outputs: The number of output that the new tensor should be.
+    : return: A 2-D tensor where the second dimension is num_outputs.
+    """
+    fc1_W = tf.Variable(tf.truncated_normal(shape=(x_tensor.shape[1].value, num_outputs)))
+    fc1_b = tf.Variable(tf.zeros(num_outputs))
+    fc1 = tf.matmul(x_tensor, fc1_W) + fc1_b
+    fc1 = tf.nn.relu(fc1)
+    return fc1
+
+
+"""
+DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
+"""
+tests.test_fully_conn(fully_conn)
+
+
+def output(x_tensor, num_outputs):
+    """
+    Apply a output layer to x_tensor using weight and bias
+    : x_tensor: A 2-D tensor where the first dimension is batch size.
+    : num_outputs: The number of output that the new tensor should be.
+    : return: A 2-D tensor where the second dimension is num_outputs.
+    """
+    fc1_W = tf.Variable(tf.truncated_normal(shape=(x_tensor.shape[1].value, num_outputs)))
+    fc1_b = tf.Variable(tf.zeros(num_outputs))
+    fc1 = tf.matmul(x_tensor, fc1_W) + fc1_b
+    return fc1
+
+
+"""
+DON'T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE
+"""
+tests.test_output(output)
+
